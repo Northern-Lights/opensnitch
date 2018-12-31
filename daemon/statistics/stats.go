@@ -9,7 +9,7 @@ import (
 	"github.com/evilsocket/opensnitch/daemon/core"
 	"github.com/evilsocket/opensnitch/daemon/log"
 	"github.com/evilsocket/opensnitch/daemon/rule"
-	"github.com/evilsocket/opensnitch/daemon/ui/protocol"
+	"github.com/evilsocket/opensnitch/ui/protocol"
 )
 
 const (

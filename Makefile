@@ -5,7 +5,7 @@ install:
 	@cd ui && make install
 
 protocol:
-	@cd proto && make
+	@cd ui/protocol && make
 
 daemon/opensnitchd:
 	@cd daemon && make
@@ -19,7 +19,7 @@ deps:
 
 clean:
 	@cd daemon && make clean
-	@cd proto && make clean
+	@cd ui/protocol && make clean
 
 run:
 	cd ui && sudo pip3 install --upgrade . && cd ..

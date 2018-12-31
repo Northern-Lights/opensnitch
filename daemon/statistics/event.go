@@ -5,7 +5,7 @@ import (
 
 	"github.com/evilsocket/opensnitch/daemon/conman"
 	"github.com/evilsocket/opensnitch/daemon/rule"
-	"github.com/evilsocket/opensnitch/daemon/ui/protocol"
+	"github.com/evilsocket/opensnitch/ui/protocol"
 )
 
 type Event struct {

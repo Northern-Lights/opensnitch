@@ -11,7 +11,7 @@ import (
 	"github.com/evilsocket/opensnitch/daemon/log"
 	"github.com/evilsocket/opensnitch/daemon/rule"
 	"github.com/evilsocket/opensnitch/daemon/statistics"
-	"github.com/evilsocket/opensnitch/daemon/ui/protocol"
+	"github.com/evilsocket/opensnitch/ui/protocol"
 
 	"golang.org/x/net/context"
 

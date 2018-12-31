@@ -10,7 +10,7 @@ import (
 	"github.com/evilsocket/opensnitch/daemon/netfilter"
 	"github.com/evilsocket/opensnitch/daemon/netstat"
 	"github.com/evilsocket/opensnitch/daemon/procmon"
-	"github.com/evilsocket/opensnitch/daemon/ui/protocol"
+	"github.com/evilsocket/opensnitch/ui/protocol"
 
 	"github.com/google/gopacket/layers"
 )
@@ -35,7 +35,7 @@ func Parse(nfp netfilter.Packet) *Connection {
 		return nil
 	}
 
-	if (ipLayer == nil) {
+	if ipLayer == nil {
 		ip, ok := ipLayer6.(*layers.IPv6)
 		if ok == false || ip == nil {
 			return nil
