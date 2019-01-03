@@ -194,6 +194,10 @@ func show(conn *protocol.Connection) {
 			fmt.Sprintf("%d", conn.UserId))
 		labelPID.obj.SetText(
 			fmt.Sprintf("%d", conn.ProcessId))
+
+		rbPort.obj.SetLabel(fmt.Sprintf("Port %d", conn.DstPort))
+		rbDomainIP.obj.SetLabel(fmt.Sprintf("Domain/IP %s", conn.DstHost))
+
 		dialog.ShowAll()
 	})
 }
