@@ -181,7 +181,8 @@ func show(conn *protocol.Connection) {
 	// See: https://github.com/gotk3/gotk3-examples/blob/master/gtk-examples/goroutines/goroutines.go
 	glib.IdleAdd(func() {
 		labelAppName.obj.SetText(
-			fmt.Sprintf("%s (%s)", conn.ProcessPath, conn.Protocol))
+			fmt.Sprintf("%s (%s)", conn.ProcessArgs[0], conn.Protocol))
+		labelAppPath.obj.SetText(conn.ProcessPath)
 		labelAppInfo.obj.SetText(
 			fmt.Sprintf("%s wants to connect to %s on %s port %d",
 				conn.ProcessPath, conn.DstHost, conn.Protocol, conn.DstPort))
