@@ -18,8 +18,8 @@ import grpc
 from opensnitch.service import UIService
 from opensnitch.config import Config
 import opensnitch.version
-import opensnitch.ui_pb2
-from opensnitch.ui_pb2_grpc import add_UIServicer_to_server
+import opensnitch.ui.ui_pb2
+from opensnitch.ui.ui_pb2_grpc import add_UIServicer_to_server
 
 def on_exit():
     app.quit()

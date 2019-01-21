@@ -13,8 +13,7 @@ import sys
 path = os.path.abspath(os.path.dirname(__file__))
 sys.path.append(path)
 
-import ui_pb2
-import ui_pb2_grpc
+from opensnitch.ui import ui_pb2, ui_pb2_grpc
 
 from dialogs.prompt import PromptDialog
 from dialogs.stats import StatsDialog

@@ -9,7 +9,6 @@ import csv
 
 from PyQt5 import QtCore, QtGui, uic, QtWidgets
 
-import ui_pb2
 from version import version
 
 DIALOG_UI_PATH = "%s/../res/stats.ui" % os.path.dirname(sys.modules[__name__].__file__)

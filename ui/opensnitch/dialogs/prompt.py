@@ -13,7 +13,7 @@ from desktop_parser import LinuxDesktopParser
 from config import Config
 from version import version
 
-import ui_pb2
+from opensnitch.rules import rules_pb2
 
 DIALOG_UI_PATH = "%s/../res/prompt.ui" % os.path.dirname(sys.modules[__name__].__file__)
 class PromptDialog(QtWidgets.QDialog, uic.loadUiType(DIALOG_UI_PATH)[0]):
@@ -187,54 +187,75 @@ class PromptDialog(QtWidgets.QDialog, uic.loadUiType(DIALOG_UI_PATH)[0]):
         e.ignore()
 
     def _on_apply_clicked(self):
-        self._rule = ui_pb2.Rule(name="user.choice")
+        self._rule = rules_pb2.Rule()
 
         action_idx = self._action_combo.currentIndex()
         if action_idx == 0:
-            self._rule.action = "allow"
+            self._rule.action = rules_pb2.ALLOW
         else:
-            self._rule.action = "deny"
+            self._rule.action = rules_pb2.DENY
 
         duration_idx = self._duration_combo.currentIndex()
         if duration_idx == 0:
-            self._rule.duration = "once"
+            self._rule.duration = rules_pb2.ONCE
         elif duration_idx == 1:
-            self._rule.duration = "until restart"
+            self._rule.duration = rules_pb2.FIREWALL_SESSION
         else:
-            self._rule.duration = "always"
+            self._rule.duration = rules_pb2.ALWAYS
+
+        # Apply rule to the current process, then add follow-up conditions.
+        # Unless it's UID, then replace it with that
+        cond = rules_pb2.Expression(operator=rules_pb2.PROC_PATH)
+        cond.strings.append(self._con.process_path)
 
         what_idx = self._what_combo.currentIndex()
         if what_idx == 0:
-            self._rule.operator.type = "simple"
-            self._rule.operator.operand = "process.path"
-            self._rule.operator.data = self._con.process_path 
+            pass
 
         elif what_idx == 1:
-            self._rule.operator.type = "simple"
-            self._rule.operator.operand = "user.id"
-            self._rule.operator.data = "%s" % self._con.user_id 
+            # TODO: implement it
+            pass
+            # self._rule.operator.type = "simple"
+            # self._rule.operator.operand = "user.id"
+            # self._rule.operator.data = "%s" % self._con.user_id 
         
         elif what_idx == 2:
-            self._rule.operator.type = "simple"
-            self._rule.operator.operand = "dest.port"
-            self._rule.operator.data = "%s" % self._con.dst_port 
+            right = rules_pb2.Expression(operation=rules_pb2.DST_PORT)
+            right.uint32s.append(self._con.dst_port)
+            cond = rules_pb2.Expression(
+                operation=rules_pb2.AND,
+                left=cond,
+                right=right)
 
         elif what_idx == 3:
-            self._rule.operator.type = "simple"
-            self._rule.operator.operand = "dest.ip"
-            self._rule.operator.data = self._con.dst_ip 
+            right = rules_pb2.Expression(operation=rules_pb2.DST_IP)
+            right.strings.append(self._con.dst_ip)
+            cond = rules_pb2.Expression(
+                operation=rules_pb2.AND,
+                left=cond,
+                right=right)
         
         elif what_idx == 4:
-            self._rule.operator.type = "simple"
-            self._rule.operator.operand = "dest.host"
-            self._rule.operator.data = self._con.dst_host 
+            right = rules_pb2.Expression(operation=rules_pb2.DST_HOST)
+            right.strings.append(self._con.dst_host)
+            cond = rules_pb2.Expression(
+                operation=rules_pb2.AND,
+                left=cond,
+                right=right)
 
         else:
-            self._rule.operator.type = "regexp"
-            self._rule.operator.operand = "dest.host"
-            self._rule.operator.data = ".*%s" % '\.'.join(self._con.dst_host.split('.')[what_idx - 4:])
+            # TODO: fix this; just copying dst host rule for now
+            right = rules_pb2.Expression(operation=rules_pb2.DST_HOST)
+            right.strings.append(self._con.dst_host)
+            cond = rules_pb2.Expression(
+                operation=rules_pb2.AND,
+                left=cond,
+                right=right)
+            # self._rule.operator.type = "regexp"
+            # self._rule.operator.operand = "dest.host"
+            # self._rule.operator.data = ".*%s" % '\.'.join(self._con.dst_host.split('.')[what_idx - 4:])
 
-        self._rule.name = slugify("%s %s %s" % (self._rule.action, self._rule.operator.type, self._rule.operator.data))
+        # self._rule.name = slugify("%s %s %s" % (self._rule.action, self._rule.operator.type, self._rule.operator.data))
         
         self.hide()
         # signal that the user took a decision and 
