@@ -176,7 +176,7 @@ func onPacket(packet netfilter.Packet) {
 	// search a match in preloaded rules
 	connected := false
 	missed := false
-	r := ruleManager.FindFirstMatch(con)
+	r := ruleManager.Match(con.Serialize())
 	if r == nil {
 		missed = true
 		// no rule matched, send a request to the
@@ -184,7 +184,7 @@ func onPacket(packet netfilter.Packet) {
 		r, connected = uiClient.Ask(con)
 		if connected {
 			ok := false
-			pers := ""
+			persistType := ""
 			action := string(r.Action)
 			if r.Action == rules.Action_ALLOW {
 				action = log.Green(action)
@@ -194,7 +194,7 @@ func onPacket(packet netfilter.Packet) {
 
 			// check if and how the rule needs to be saved
 			if r.Duration == rules.Duration_FIREWALL_SESSION {
-				pers = "Added"
+				persistType = "Added"
 				// add to the rules but do not save to disk
 				if err := ruleManager.Add(r); err != nil {
 					log.Error("Error while adding rule: %s", err)
@@ -202,7 +202,7 @@ func onPacket(packet netfilter.Packet) {
 					ok = true
 				}
 			} else if r.Duration == rules.Duration_ALWAYS {
-				pers = "Saved"
+				persistType = "Saved"
 				// add to the loaded rules and persist on disk
 				if err := ruleManager.Add(r); err != nil {
 					log.Error("Error while saving rule: %s", err)
@@ -212,7 +212,7 @@ func onPacket(packet netfilter.Packet) {
 			}
 
 			if ok {
-				log.Important("%s new rule: %s if %s", pers, action, r.Condition.Operation)
+				log.Important("%s new rule: %s if %s", persistType, action, r.Condition.Operation)
 			}
 		}
 	}

@@ -6,7 +6,6 @@ import (
 
 	"github.com/Northern-Lights/os-rules-engine/network"
 	"github.com/Northern-Lights/os-rules-engine/rules"
-	"github.com/evilsocket/opensnitch/daemon/conman"
 )
 
 // Manager manages rules in memory and their storage
@@ -68,13 +67,6 @@ func (m *Manager) Count() int {
 	defer m.RUnlock()
 
 	return len(m.rules)
-}
-
-// FindFirstMatch is used as an adapter between the old "Loader," using the old
-// protobufs, and this manager which uses the new protobufs
-func (m *Manager) FindFirstMatch(conn *conman.Connection) *rules.Rule {
-	pb := conn.Serialize()
-	return m.Match(pb)
 }
 
 // Match finds and returns the first matching rule or nil if no matches occured
