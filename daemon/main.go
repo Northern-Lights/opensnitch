@@ -12,7 +12,7 @@ import (
 	"syscall"
 
 	engine "github.com/Northern-Lights/os-rules-engine"
-	rules2 "github.com/Northern-Lights/os-rules-engine/rules"
+	"github.com/Northern-Lights/os-rules-engine/rules"
 	"github.com/evilsocket/opensnitch/daemon/conman"
 	"github.com/evilsocket/opensnitch/daemon/core"
 	"github.com/evilsocket/opensnitch/daemon/dns"
@@ -39,13 +39,13 @@ var (
 	cpuProfile = ""
 	memProfile = ""
 
-	err     = (error)(nil)
-	rules   rule.Manager
-	stats   = (*statistics.Statistics)(nil)
-	queue   = (*netfilter.Queue)(nil)
-	pktChan = (<-chan netfilter.Packet)(nil)
-	wrkChan = (chan netfilter.Packet)(nil)
-	sigChan = (chan os.Signal)(nil)
+	err         = (error)(nil)
+	ruleManager rule.Manager
+	stats       = (*statistics.Statistics)(nil)
+	queue       = (*netfilter.Queue)(nil)
+	pktChan     = (<-chan netfilter.Packet)(nil)
+	wrkChan     = (chan netfilter.Packet)(nil)
+	sigChan     = (chan os.Signal)(nil)
 )
 
 func init() {
@@ -87,10 +87,10 @@ func setupManager(rulesPath string) {
 	if err != nil {
 		log.Fatal("Couldn't create rule manager: %s", err)
 	}
-	rules = *pRules
+	ruleManager = *pRules
 
 	log.Info("Loading rules from %s ...", rulesPath)
-	_, err = rules.LoadRules()
+	_, err = ruleManager.LoadRules()
 	if err != nil {
 		log.Fatal("Couldn't load rules: %s", err)
 	}
@@ -176,7 +176,7 @@ func onPacket(packet netfilter.Packet) {
 	// search a match in preloaded rules
 	connected := false
 	missed := false
-	r := rules.FindFirstMatch(con)
+	r := ruleManager.FindFirstMatch(con)
 	if r == nil {
 		missed = true
 		// no rule matched, send a request to the
@@ -186,25 +186,25 @@ func onPacket(packet netfilter.Packet) {
 			ok := false
 			pers := ""
 			action := string(r.Action)
-			if r.Action == rules2.Action_ALLOW {
+			if r.Action == rules.Action_ALLOW {
 				action = log.Green(action)
 			} else {
 				action = log.Red(action)
 			}
 
 			// check if and how the rule needs to be saved
-			if r.Duration == rules2.Duration_FIREWALL_SESSION {
+			if r.Duration == rules.Duration_FIREWALL_SESSION {
 				pers = "Added"
 				// add to the rules but do not save to disk
-				if err := rules.Add(r); err != nil {
+				if err := ruleManager.Add(r); err != nil {
 					log.Error("Error while adding rule: %s", err)
 				} else {
 					ok = true
 				}
-			} else if r.Duration == rules2.Duration_ALWAYS {
+			} else if r.Duration == rules.Duration_ALWAYS {
 				pers = "Saved"
 				// add to the loaded rules and persist on disk
-				if err := rules.Add(r); err != nil {
+				if err := ruleManager.Add(r); err != nil {
 					log.Error("Error while saving rule: %s", err)
 				} else {
 					ok = true
@@ -219,12 +219,12 @@ func onPacket(packet netfilter.Packet) {
 
 	stats.OnConnectionEvent(con, r, missed)
 
-	if r.Action == rules2.Action_ALLOW {
+	if r.Action == rules.Action_ALLOW {
 		packet.SetVerdict(netfilter.NF_ACCEPT)
 
 		ruleName := log.Green("names not yet supported")
 		// if r.Operator.Operand == rule.OpTrue {
-		if r.Condition.Operation == rules2.Operation_TRUE {
+		if r.Condition.Operation == rules.Operation_TRUE {
 			ruleName = log.Dim("names not yet supported")
 		}
 		log.Debug("%s %s -> %s:%d (%s)", log.Bold(log.Green("✔")), log.Bold(con.Process.Path), log.Bold(con.To()), con.DstPort, ruleName)
@@ -262,7 +262,7 @@ func main() {
 	setupSignals()
 	setupManager(rulesPath)
 
-	stats = statistics.New(&rules)
+	stats = statistics.New(&ruleManager)
 
 	// prepare the queue
 	setupWorkers()
