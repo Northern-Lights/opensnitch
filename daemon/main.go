@@ -77,6 +77,25 @@ func setupLogging() {
 	}
 }
 
+func setupManager(rulesPath string) {
+	persistence := engine.NewJSONLoader(rulesPath)
+	mgrOpts := []rule.ManagerOption{
+		rule.WithLoader(persistence),
+		rule.WithSaver(persistence),
+	}
+	pRules, err := rule.NewManager(mgrOpts...)
+	if err != nil {
+		log.Fatal("Couldn't create rule manager: %s", err)
+	}
+	rules = *pRules
+
+	log.Info("Loading rules from %s ...", rulesPath)
+	_, err = rules.LoadRules()
+	if err != nil {
+		log.Fatal("Couldn't load rules: %s", err)
+	}
+}
+
 func setupSignals() {
 	sigChan = make(chan os.Signal, 1)
 	signal.Notify(sigChan,
@@ -241,23 +260,7 @@ func main() {
 	}
 
 	setupSignals()
-
-	persistence := engine.NewJSONLoader(rulesPath)
-	mgrOpts := []rule.ManagerOption{
-		rule.WithLoader(persistence),
-		rule.WithSaver(persistence),
-	}
-	pRules, err := rule.NewManager(mgrOpts...)
-	if err != nil {
-		log.Fatal("Couldn't create rule manager: %s", err)
-	}
-	rules = *pRules
-
-	log.Info("Loading rules from %s ...", rulesPath)
-	_, err = rules.LoadRules()
-	if err != nil {
-		log.Fatal("Couldn't load rules: %s", err)
-	}
+	setupManager(rulesPath)
 
 	stats = statistics.New(&rules)
 
