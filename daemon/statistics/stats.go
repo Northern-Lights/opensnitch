@@ -10,8 +10,12 @@ import (
 	"github.com/evilsocket/opensnitch/daemon/conman"
 	"github.com/evilsocket/opensnitch/daemon/core"
 	"github.com/evilsocket/opensnitch/daemon/log"
-	"github.com/evilsocket/opensnitch/daemon/rule"
 )
+
+// A RuleCounter is able to count how many rules are contained
+type RuleCounter interface {
+	Count() int
+}
 
 const (
 	// max number of events to keep in the buffer
@@ -45,11 +49,11 @@ type Statistics struct {
 	ByUID        map[string]uint64
 	ByExecutable map[string]uint64
 
-	rules rule.Counter
+	rules RuleCounter
 	jobs  chan conEvent
 }
 
-func New(rules rule.Counter) (stats *Statistics) {
+func New(rules RuleCounter) (stats *Statistics) {
 	stats = &Statistics{
 		Started:      time.Now(),
 		Events:       make([]*Event, 0),

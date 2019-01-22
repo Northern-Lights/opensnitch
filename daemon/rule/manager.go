@@ -9,10 +9,6 @@ import (
 	"github.com/evilsocket/opensnitch/daemon/conman"
 )
 
-type Counter interface {
-	Count() int
-}
-
 // Manager manages rules in memory and their storage
 type Manager struct {
 	sync.RWMutex
