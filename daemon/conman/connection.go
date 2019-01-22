@@ -5,12 +5,12 @@ import (
 	"net"
 	"os"
 
+	"github.com/Northern-Lights/os-rules-engine/network"
 	"github.com/evilsocket/opensnitch/daemon/dns"
 	"github.com/evilsocket/opensnitch/daemon/log"
 	"github.com/evilsocket/opensnitch/daemon/netfilter"
 	"github.com/evilsocket/opensnitch/daemon/netstat"
 	"github.com/evilsocket/opensnitch/daemon/procmon"
-	"github.com/evilsocket/opensnitch/daemon/ui/protocol"
 
 	"github.com/google/gopacket/layers"
 )
@@ -35,7 +35,7 @@ func Parse(nfp netfilter.Packet) *Connection {
 		return nil
 	}
 
-	if (ipLayer == nil) {
+	if ipLayer == nil {
 		ip, ok := ipLayer6.(*layers.IPv6)
 		if ok == false || ip == nil {
 			return nil
@@ -180,9 +180,17 @@ func (c *Connection) String() string {
 	return fmt.Sprintf("%s (%d) -> %s:%d (proto:%s uid:%d)", c.Process.Path, c.Process.ID, c.To(), c.DstPort, c.Protocol, c.Entry.UserId)
 }
 
-func (c *Connection) Serialize() *protocol.Connection {
-	return &protocol.Connection{
-		Protocol:    c.Protocol,
+func (c *Connection) Serialize() *network.Connection {
+	var protocol network.Connection_Protocol
+	switch c.Protocol {
+	case "tcp":
+		protocol = network.Connection_TCP
+	case "udp":
+		protocol = network.Connection_UDP
+	}
+
+	return &network.Connection{
+		Protocol:    protocol,
 		SrcIp:       c.SrcIP.String(),
 		SrcPort:     uint32(c.SrcPort),
 		DstIp:       c.DstIP.String(),

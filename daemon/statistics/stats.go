@@ -5,11 +5,12 @@ import (
 	"sync"
 	"time"
 
+	"github.com/Northern-Lights/os-rules-engine/rules"
+	protocol "github.com/Northern-Lights/os-rules-engine/ui"
 	"github.com/evilsocket/opensnitch/daemon/conman"
 	"github.com/evilsocket/opensnitch/daemon/core"
 	"github.com/evilsocket/opensnitch/daemon/log"
 	"github.com/evilsocket/opensnitch/daemon/rule"
-	"github.com/evilsocket/opensnitch/daemon/ui/protocol"
 )
 
 const (
@@ -21,7 +22,7 @@ const (
 
 type conEvent struct {
 	con       *conman.Connection
-	match     *rule.Rule
+	match     *rules.Rule
 	wasMissed bool
 }
 
@@ -44,11 +45,11 @@ type Statistics struct {
 	ByUID        map[string]uint64
 	ByExecutable map[string]uint64
 
-	rules *rule.Loader
+	rules rule.Counter
 	jobs  chan conEvent
 }
 
-func New(rules *rule.Loader) (stats *Statistics) {
+func New(rules rule.Counter) (stats *Statistics) {
 	stats = &Statistics{
 		Started:      time.Now(),
 		Events:       make([]*Event, 0),
@@ -122,7 +123,7 @@ func (s *Statistics) eventWorker(id int) {
 	}
 }
 
-func (s *Statistics) onConnection(con *conman.Connection, match *rule.Rule, wasMissed bool) {
+func (s *Statistics) onConnection(con *conman.Connection, match *rules.Rule, wasMissed bool) {
 	s.Lock()
 	defer s.Unlock()
 
@@ -134,7 +135,7 @@ func (s *Statistics) onConnection(con *conman.Connection, match *rule.Rule, wasM
 		s.RuleHits++
 	}
 
-	if match.Action == rule.Allow {
+	if match.Action == rules.Action_ALLOW {
 		s.Accepted++
 	} else {
 		s.Dropped++
@@ -155,10 +156,10 @@ func (s *Statistics) onConnection(con *conman.Connection, match *rule.Rule, wasM
 	if nEvents == maxEvents {
 		s.Events = s.Events[1:]
 	}
-	s.Events = append(s.Events, NewEvent(con, match))
+	s.Events = append(s.Events, NewEvent(con.Serialize(), match))
 }
 
-func (s *Statistics) OnConnectionEvent(con *conman.Connection, match *rule.Rule, wasMissed bool) {
+func (s *Statistics) OnConnectionEvent(con *conman.Connection, match *rules.Rule, wasMissed bool) {
 	s.jobs <- conEvent{
 		con:       con,
 		match:     match,
@@ -183,7 +184,7 @@ func (s *Statistics) Serialize() *protocol.Statistics {
 
 	return &protocol.Statistics{
 		DaemonVersion: core.Version,
-		Rules:         uint64(s.rules.NumRules()),
+		Rules:         uint64(s.rules.Count()),
 		Uptime:        uint64(time.Since(s.Started).Seconds()),
 		DnsResponses:  uint64(s.DNSResponses),
 		Connections:   uint64(s.Connections),

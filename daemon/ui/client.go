@@ -7,11 +7,14 @@ import (
 	"sync"
 	"time"
 
+	"github.com/Northern-Lights/os-rules-engine/rules"
+
+	protocol "github.com/Northern-Lights/os-rules-engine/ui"
 	"github.com/evilsocket/opensnitch/daemon/conman"
 	"github.com/evilsocket/opensnitch/daemon/log"
-	"github.com/evilsocket/opensnitch/daemon/rule"
 	"github.com/evilsocket/opensnitch/daemon/statistics"
-	"github.com/evilsocket/opensnitch/daemon/ui/protocol"
+
+	// "github.com/evilsocket/opensnitch/daemon/ui/protocol"
 
 	"golang.org/x/net/context"
 
@@ -20,9 +23,27 @@ import (
 )
 
 var (
-	clientDisconnectedRule = rule.Create("ui.client.disconnected", rule.Allow, rule.Once, rule.NewOperator(rule.Simple, rule.OpTrue, "", make([]rule.Operator, 0)))
-	clientErrorRule        = rule.Create("ui.client.error", rule.Allow, rule.Once, rule.NewOperator(rule.Simple, rule.OpTrue, "", make([]rule.Operator, 0)))
+	clientDisconnectedRule = &rules.Rule{
+		Action:   rules.Action_ALLOW,
+		Duration: rules.Duration_ONCE,
+		Condition: &rules.Expression{
+			Operation: rules.Operation_TRUE,
+		},
+	}
+
+	clientErrorRule = &rules.Rule{
+		Action:   rules.Action_ALLOW,
+		Duration: rules.Duration_ONCE,
+		Condition: &rules.Expression{
+			Operation: rules.Operation_TRUE,
+		},
+	}
 )
+
+// var (
+// 	clientDisconnectedRule = rule.Create("ui.client.disconnected", rule.Allow, rule.Once, rule.NewOperator(rule.Simple, rule.OpTrue, "", make([]rule.Operator, 0)))
+// 	clientErrorRule        = rule.Create("ui.client.error", rule.Allow, rule.Once, rule.NewOperator(rule.Simple, rule.OpTrue, "", make([]rule.Operator, 0)))
+// )
 
 type Client struct {
 	sync.Mutex
@@ -140,7 +161,7 @@ func (c *Client) ping(ts time.Time) (err error) {
 	return nil
 }
 
-func (c *Client) Ask(con *conman.Connection) (*rule.Rule, bool) {
+func (c *Client) Ask(con *conman.Connection) (*rules.Rule, bool) {
 	if c.Connected() == false {
 		return clientDisconnectedRule, false
 	}
@@ -156,5 +177,6 @@ func (c *Client) Ask(con *conman.Connection) (*rule.Rule, bool) {
 		return clientErrorRule, false
 	}
 
-	return rule.Deserialize(reply), true
+	// return rule.Deserialize(reply), true
+	return reply, true
 }

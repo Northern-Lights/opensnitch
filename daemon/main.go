@@ -11,6 +11,8 @@ import (
 	"runtime/pprof"
 	"syscall"
 
+	engine "github.com/Northern-Lights/os-rules-engine"
+	rules2 "github.com/Northern-Lights/os-rules-engine/rules"
 	"github.com/evilsocket/opensnitch/daemon/conman"
 	"github.com/evilsocket/opensnitch/daemon/core"
 	"github.com/evilsocket/opensnitch/daemon/dns"
@@ -38,7 +40,7 @@ var (
 	memProfile = ""
 
 	err     = (error)(nil)
-	rules   = (*rule.Loader)(nil)
+	rules   rule.Manager
 	stats   = (*statistics.Statistics)(nil)
 	queue   = (*netfilter.Queue)(nil)
 	pktChan = (<-chan netfilter.Packet)(nil)
@@ -165,25 +167,25 @@ func onPacket(packet netfilter.Packet) {
 			ok := false
 			pers := ""
 			action := string(r.Action)
-			if r.Action == rule.Allow {
+			if r.Action == rules2.Action_ALLOW {
 				action = log.Green(action)
 			} else {
 				action = log.Red(action)
 			}
 
 			// check if and how the rule needs to be saved
-			if r.Duration == rule.Restart {
+			if r.Duration == rules2.Duration_FIREWALL_SESSION {
 				pers = "Added"
 				// add to the rules but do not save to disk
-				if err := rules.Add(r, false); err != nil {
+				if err := rules.Add(r); err != nil {
 					log.Error("Error while adding rule: %s", err)
 				} else {
 					ok = true
 				}
-			} else if r.Duration == rule.Always {
+			} else if r.Duration == rules2.Duration_ALWAYS {
 				pers = "Saved"
 				// add to the loaded rules and persist on disk
-				if err := rules.Add(r, true); err != nil {
+				if err := rules.Add(r); err != nil {
 					log.Error("Error while saving rule: %s", err)
 				} else {
 					ok = true
@@ -191,25 +193,26 @@ func onPacket(packet netfilter.Packet) {
 			}
 
 			if ok {
-				log.Important("%s new rule: %s if %s", pers, action, r.Operator.String())
+				log.Important("%s new rule: %s if %s", pers, action, r.Condition.Operation)
 			}
 		}
 	}
 
 	stats.OnConnectionEvent(con, r, missed)
 
-	if r.Action == rule.Allow {
+	if r.Action == rules2.Action_ALLOW {
 		packet.SetVerdict(netfilter.NF_ACCEPT)
 
-		ruleName := log.Green(r.Name)
-		if r.Operator.Operand == rule.OpTrue {
-			ruleName = log.Dim(r.Name)
+		ruleName := log.Green("names not yet supported")
+		// if r.Operator.Operand == rule.OpTrue {
+		if r.Condition.Operation == rules2.Operation_TRUE {
+			ruleName = log.Dim("names not yet supported")
 		}
 		log.Debug("%s %s -> %s:%d (%s)", log.Bold(log.Green("✔")), log.Bold(con.Process.Path), log.Bold(con.To()), con.DstPort, ruleName)
 	} else {
 		packet.SetVerdictAndMark(netfilter.NF_DROP, firewall.DropMark)
 
-		log.Warning("%s %s -> %s:%d (%s)", log.Bold(log.Red("✘")), log.Bold(con.Process.Path), log.Bold(con.To()), con.DstPort, log.Red(r.Name))
+		log.Warning("%s %s -> %s:%d (%s)", log.Bold(log.Red("✘")), log.Bold(con.Process.Path), log.Bold(con.To()), con.DstPort, log.Red("names not yet supported"))
 	}
 }
 
@@ -239,13 +242,24 @@ func main() {
 
 	setupSignals()
 
-	log.Info("Loading rules from %s ...", rulesPath)
-	if rules, err = rule.NewLoader(!noLiveReload); err != nil {
-		log.Fatal("%s", err)
-	} else if err = rules.Load(rulesPath); err != nil {
-		log.Fatal("%s", err)
+	persistence := engine.NewJSONLoader(rulesPath)
+	mgrOpts := []rule.ManagerOption{
+		rule.WithLoader(persistence),
+		rule.WithSaver(persistence),
 	}
-	stats = statistics.New(rules)
+	pRules, err := rule.NewManager(mgrOpts...)
+	if err != nil {
+		log.Fatal("Couldn't create rule manager: %s", err)
+	}
+	rules = *pRules
+
+	log.Info("Loading rules from %s ...", rulesPath)
+	_, err = rules.LoadRules()
+	if err != nil {
+		log.Fatal("Couldn't load rules: %s", err)
+	}
+
+	stats = statistics.New(&rules)
 
 	// prepare the queue
 	setupWorkers()

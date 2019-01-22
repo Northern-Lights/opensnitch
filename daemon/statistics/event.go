@@ -3,18 +3,18 @@ package statistics
 import (
 	"time"
 
-	"github.com/evilsocket/opensnitch/daemon/conman"
-	"github.com/evilsocket/opensnitch/daemon/rule"
-	"github.com/evilsocket/opensnitch/daemon/ui/protocol"
+	"github.com/Northern-Lights/os-rules-engine/network"
+	"github.com/Northern-Lights/os-rules-engine/rules"
+	protocol "github.com/Northern-Lights/os-rules-engine/ui"
 )
 
 type Event struct {
 	Time       time.Time
-	Connection *conman.Connection
-	Rule       *rule.Rule
+	Connection *network.Connection
+	Rule       *rules.Rule
 }
 
-func NewEvent(con *conman.Connection, match *rule.Rule) *Event {
+func NewEvent(con *network.Connection, match *rules.Rule) *Event {
 	return &Event{
 		Time:       time.Now(),
 		Connection: con,
@@ -25,7 +25,7 @@ func NewEvent(con *conman.Connection, match *rule.Rule) *Event {
 func (e *Event) Serialize() *protocol.Event {
 	return &protocol.Event{
 		Time:       e.Time.Format("2006-01-02 15:04:05"),
-		Connection: e.Connection.Serialize(),
-		Rule:       e.Rule.Serialize(),
+		Connection: e.Connection,
+		Rule:       e.Rule,
 	}
 }
