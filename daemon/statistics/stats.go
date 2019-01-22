@@ -41,7 +41,7 @@ type Statistics struct {
 	Dropped      int
 	RuleHits     int
 	RuleMisses   int
-	Events       []*Event
+	Events       []*protocol.Event
 	ByProto      map[string]uint64
 	ByAddress    map[string]uint64
 	ByHost       map[string]uint64
@@ -56,7 +56,7 @@ type Statistics struct {
 func New(rules RuleCounter) (stats *Statistics) {
 	stats = &Statistics{
 		Started:      time.Now(),
-		Events:       make([]*Event, 0),
+		Events:       make([]*protocol.Event, 0),
 		ByProto:      make(map[string]uint64),
 		ByAddress:    make(map[string]uint64),
 		ByHost:       make(map[string]uint64),
@@ -171,17 +171,6 @@ func (s *Statistics) OnConnectionEvent(con *conman.Connection, match *rules.Rule
 	}
 }
 
-func (s *Statistics) serializeEvents() []*protocol.Event {
-	nEvents := len(s.Events)
-	serialized := make([]*protocol.Event, nEvents)
-
-	for i, e := range s.Events {
-		serialized[i] = e.Serialize()
-	}
-
-	return serialized
-}
-
 func (s *Statistics) Serialize() *protocol.Statistics {
 	s.Lock()
 	defer s.Unlock()
@@ -197,7 +186,7 @@ func (s *Statistics) Serialize() *protocol.Statistics {
 		Dropped:       uint64(s.Dropped),
 		RuleHits:      uint64(s.RuleHits),
 		RuleMisses:    uint64(s.RuleMisses),
-		Events:        s.serializeEvents(),
+		Events:        s.Events,
 		ByProto:       s.ByProto,
 		ByAddress:     s.ByAddress,
 		ByHost:        s.ByHost,
