@@ -255,7 +255,8 @@ class PromptDialog(QtWidgets.QDialog, uic.loadUiType(DIALOG_UI_PATH)[0]):
             # self._rule.operator.operand = "dest.host"
             # self._rule.operator.data = ".*%s" % '\.'.join(self._con.dst_host.split('.')[what_idx - 4:])
 
-        # self._rule.name = slugify("%s %s %s" % (self._rule.action, self._rule.operator.type, self._rule.operator.data))
+        # TODO: find a better way to name it now that we have complex expressions
+        self._rule.name = slugify("%s %s %s" % (self._con.process_path, self._rule.action, what_idx))
         
         self.hide()
         # signal that the user took a decision and 
