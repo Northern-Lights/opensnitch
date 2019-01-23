@@ -222,16 +222,15 @@ func onPacket(packet netfilter.Packet) {
 	if r.Action == rules.Action_ALLOW {
 		packet.SetVerdict(netfilter.NF_ACCEPT)
 
-		ruleName := log.Green("names not yet supported")
-		// if r.Operator.Operand == rule.OpTrue {
+		ruleName := log.Green(r.Name)
 		if r.Condition.Operation == rules.Operation_TRUE {
-			ruleName = log.Dim("names not yet supported")
+			ruleName = log.Dim(r.Name)
 		}
 		log.Debug("%s %s -> %s:%d (%s)", log.Bold(log.Green("✔")), log.Bold(con.Process.Path), log.Bold(con.To()), con.DstPort, ruleName)
 	} else {
 		packet.SetVerdictAndMark(netfilter.NF_DROP, firewall.DropMark)
 
-		log.Warning("%s %s -> %s:%d (%s)", log.Bold(log.Red("✘")), log.Bold(con.Process.Path), log.Bold(con.To()), con.DstPort, log.Red("names not yet supported"))
+		log.Warning("%s %s -> %s:%d (%s)", log.Bold(log.Red("✘")), log.Bold(con.Process.Path), log.Bold(con.To()), con.DstPort, log.Red(r.Name))
 	}
 }
 
