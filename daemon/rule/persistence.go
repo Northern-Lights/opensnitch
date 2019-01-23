@@ -4,12 +4,12 @@ import (
 	"github.com/Northern-Lights/os-rules-engine/rules"
 )
 
-// A Loader loads rules from a reader source
+// A Loader loads rules
 type Loader interface {
 	LoadRules() ([]*rules.Rule, error)
 }
 
-// A Saver saves rules to a storage writer
+// A Saver saves rules
 type Saver interface {
 	SaveRules([]*rules.Rule) error
 }
