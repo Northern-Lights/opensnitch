@@ -225,12 +225,6 @@ func onPacket(packet netfilter.Packet) {
 		}
 	}
 
-	// FIXME: log in uiClient.Ask; return default rule
-	if r.Condition == nil {
-		log.Error("Rule %s has no condition; using default", r.Name)
-		return
-	}
-
 	stats.OnConnectionEvent(con, r, missed)
 
 	if r.Action == rules.Action_ALLOW {
@@ -274,6 +268,7 @@ func main() {
 
 	setupSignals()
 	setupManager(rulesPath)
+	rule.DeserializeExpression = engine.Deserialize
 
 	stats = statistics.New(&ruleManager)
 
