@@ -212,7 +212,7 @@ func onPacket(packet netfilter.Packet) {
 			} else if r.Duration == rules.Duration_ALWAYS {
 				persistType = "Saved"
 				// add to the loaded rules and persist on disk
-				if err := ruleManager.Add(r); err != nil {
+				if err := ruleManager.AddAndSave(r); err != nil {
 					log.Error("Error while saving rule: %s", err)
 				} else {
 					ok = true
