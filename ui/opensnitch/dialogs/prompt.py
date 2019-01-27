@@ -205,7 +205,7 @@ class PromptDialog(QtWidgets.QDialog, uic.loadUiType(DIALOG_UI_PATH)[0]):
 
         # Apply rule to the current process, then add follow-up conditions.
         # Unless it's UID, then replace it with that
-        cond = rules_pb2.Expression(operator=rules_pb2.PROC_PATH)
+        cond = rules_pb2.Expression(operation=rules_pb2.PROC_PATH)
         cond.strings.append(self._con.process_path)
 
         what_idx = self._what_combo.currentIndex()
@@ -254,6 +254,8 @@ class PromptDialog(QtWidgets.QDialog, uic.loadUiType(DIALOG_UI_PATH)[0]):
             # self._rule.operator.type = "regexp"
             # self._rule.operator.operand = "dest.host"
             # self._rule.operator.data = ".*%s" % '\.'.join(self._con.dst_host.split('.')[what_idx - 4:])
+        
+        self._rule.condition.CopyFrom(cond)
 
         # TODO: find a better way to name it now that we have complex expressions
         self._rule.name = slugify("%s %s %s" % (self._con.process_path, self._rule.action, what_idx))
