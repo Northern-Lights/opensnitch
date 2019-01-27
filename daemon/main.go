@@ -2,7 +2,6 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"io/ioutil"
 	golog "log"
 	"os"
@@ -133,11 +132,20 @@ func setupWorkers() {
 
 func doCleanup() {
 	log.Info("Cleaning up ...")
-	firewall.QueueDNSResponses(false, queueNum)
-	firewall.QueueConnections(false, queueNum)
-	firewall.DropMarked(false)
+	if err := firewall.QueueDNSResponses(false, queueNum); err != nil {
+		log.Error("Couldn't disable QueueDNSResponses: %s", err)
+	} else if err = firewall.QueueConnections(false, queueNum); err != nil {
+		log.Error("Couldn't disable QueueConnections: %s", err)
+	} else if err = firewall.DropMarked(false); err != nil {
+		log.Error("Couldn't disable DropMarked: %s", err)
+	}
 
-	go procmon.Stop()
+	go func() {
+		err := procmon.Stop()
+		if err != nil {
+			log.Error("Couldn't stop procmon: %s", err)
+		}
+	}()
 
 	if cpuProfile != "" {
 		pprof.StopCPUProfile()
@@ -146,13 +154,13 @@ func doCleanup() {
 	if memProfile != "" {
 		f, err := os.Create(memProfile)
 		if err != nil {
-			fmt.Printf("Could not create memory profile: %s\n", err)
+			log.Error("Could not create memory profile: %s\n", err)
 			return
 		}
 		defer f.Close()
 		runtime.GC() // get up-to-date statistics
 		if err := pprof.WriteHeapProfile(f); err != nil {
-			fmt.Printf("Could not write memory profile: %s\n", err)
+			log.Error("Could not write memory profile: %s\n", err)
 		}
 	}
 }
@@ -215,6 +223,12 @@ func onPacket(packet netfilter.Packet) {
 				log.Important("%s new rule: %s if %s", persistType, action, r.Condition.Operation)
 			}
 		}
+	}
+
+	// FIXME: log in uiClient.Ask; return default rule
+	if r.Condition == nil {
+		log.Error("Rule %s has no condition; using default", r.Name)
+		return
 	}
 
 	stats.OnConnectionEvent(con, r, missed)
