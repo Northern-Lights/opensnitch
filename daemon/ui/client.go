@@ -161,9 +161,12 @@ func (c *Client) ping(ts time.Time) (err error) {
 	return nil
 }
 
-func (c *Client) Ask(con *conman.Connection) (*rules.Rule, bool) {
+func (c *Client) Ask(con *conman.Connection) (r *rules.Rule, success bool) {
+	r = clientErrorRule
+
 	if c.Connected() == false {
-		return clientDisconnectedRule, false
+		r = clientDisconnectedRule
+		return
 	}
 
 	c.Lock()
@@ -174,9 +177,23 @@ func (c *Client) Ask(con *conman.Connection) (*rules.Rule, bool) {
 	reply, err := c.client.AskRule(ctx, con.Serialize())
 	if err != nil {
 		log.Warning("Error while asking for rule: %s", err)
-		return clientErrorRule, false
+		return
 	}
 
-	// return rule.Deserialize(reply), true
-	return reply, true
+	if reply.Action == rules.Action_ACTION_UNKNOWN {
+		log.Warning("Reply had unknown action; returning default error rule")
+		return
+	}
+	if reply.Duration == rules.Duration_DURATION_UNKNOWN {
+		log.Warning("Reply had unknown duration; returning default error rule")
+		return
+	}
+	if reply.Condition == nil {
+		log.Warning("Reply had nil condition; returning default error rule")
+		return
+	}
+
+	r = reply
+	success = true
+	return
 }
