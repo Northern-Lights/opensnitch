@@ -41,11 +41,7 @@ func (m *Manager) Add(r *rules.Rule) (err error) {
 
 // AddAndSave adds the given rule and stores it, if a saver is set
 func (m *Manager) AddAndSave(r *rules.Rule) (err error) {
-	m.Lock()
-	defer m.Unlock()
-
-	m.rules = append(m.rules, r)
-
+	m.Add(r)
 	if m.Saver != nil {
 		err = m.Saver.SaveRules(m.rules)
 	}
