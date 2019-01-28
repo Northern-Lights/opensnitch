@@ -251,9 +251,6 @@ class PromptDialog(QtWidgets.QDialog, uic.loadUiType(DIALOG_UI_PATH)[0]):
                 operation=rules_pb2.AND,
                 left=cond,
                 right=right)
-            # self._rule.operator.type = "regexp"
-            # self._rule.operator.operand = "dest.host"
-            # self._rule.operator.data = ".*%s" % '\.'.join(self._con.dst_host.split('.')[what_idx - 4:])
         
         self._rule.condition.CopyFrom(cond)
 

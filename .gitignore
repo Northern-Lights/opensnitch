@@ -1,4 +1,6 @@
 *.sock
 *.pyc
 *.profile
-rules
+.env
+.env/
+.vscode/
