@@ -12,14 +12,18 @@ import (
 type Manager struct {
 	sync.RWMutex
 
+	deserialize ExpressionDeserializer
+
 	Loader
 	Saver
 
 	rules []*rules.Rule
 }
 
-func NewManager(opts ...ManagerOption) (*Manager, error) {
+func NewManager(f ExpressionDeserializer, opts ...ManagerOption) (*Manager, error) {
 	var m Manager
+	m.deserialize = f
+
 	for _, opt := range opts {
 		err := opt(&m)
 		if err != nil {
@@ -49,7 +53,9 @@ func (m *Manager) AddAndSave(r *rules.Rule) (err error) {
 	return
 }
 
-// LoadRules uses the Loader to load and replace the in-memory rules
+// LoadRules uses the Loader to load and replace the in-memory rules. If an
+// error occurs, the in-memory rules are not replaced, and a nil ruleset is
+// returned with the error
 func (m *Manager) LoadRules() (ruleset []*rules.Rule, err error) {
 	m.Lock()
 	defer m.Unlock()
@@ -64,6 +70,8 @@ func (m *Manager) LoadRules() (ruleset []*rules.Rule, err error) {
 		ruleset = nil
 		return
 	}
+
+	m.rules = ruleset
 
 	return
 }
@@ -81,7 +89,7 @@ func (m *Manager) Match(conn *network.Connection) *rules.Rule {
 	defer m.RUnlock()
 
 	for _, r := range m.rules {
-		expr, err := DeserializeExpression(r.Condition)
+		expr, err := m.deserialize(r.Condition)
 		if err != nil {
 			continue
 		}

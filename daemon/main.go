@@ -39,7 +39,7 @@ var (
 	memProfile = ""
 
 	err         = (error)(nil)
-	ruleManager rule.Manager
+	ruleManager *rule.Manager
 	stats       = (*statistics.Statistics)(nil)
 	queue       = (*netfilter.Queue)(nil)
 	pktChan     = (<-chan netfilter.Packet)(nil)
@@ -82,17 +82,17 @@ func setupManager(rulesPath string) {
 		rule.WithLoader(persistence),
 		rule.WithSaver(persistence),
 	}
-	pRules, err := rule.NewManager(mgrOpts...)
+	var err error
+	ruleManager, err = rule.NewManager(engine.Deserialize, mgrOpts...)
 	if err != nil {
 		log.Fatal("Couldn't create rule manager: %s", err)
 	}
-	ruleManager = *pRules
 
-	log.Info("Loading rules from %s ...", rulesPath)
 	_, err = ruleManager.LoadRules()
 	if err != nil {
-		log.Fatal("Couldn't load rules: %s", err)
+		log.Fatal("Couldn't load rules from %s: %s", rulesPath, err)
 	}
+	log.Info("Loaded %d rules from %s", ruleManager.Count(), rulesPath)
 }
 
 func setupSignals() {
@@ -268,9 +268,8 @@ func main() {
 
 	setupSignals()
 	setupManager(rulesPath)
-	rule.DeserializeExpression = engine.Deserialize
 
-	stats = statistics.New(&ruleManager)
+	stats = statistics.New(ruleManager)
 
 	// prepare the queue
 	setupWorkers()
