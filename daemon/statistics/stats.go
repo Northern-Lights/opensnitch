@@ -5,11 +5,11 @@ import (
 	"sync"
 	"time"
 
-	"github.com/Northern-Lights/os-rules-engine/rules"
-	protocol "github.com/Northern-Lights/os-rules-engine/ui"
 	"github.com/evilsocket/opensnitch/daemon/conman"
 	"github.com/evilsocket/opensnitch/daemon/core"
 	"github.com/evilsocket/opensnitch/daemon/log"
+	"github.com/evilsocket/opensnitch/rules"
+	protocol "github.com/evilsocket/opensnitch/ui"
 )
 
 // A RuleCounter is able to count how many rules are contained

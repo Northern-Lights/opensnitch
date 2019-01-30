@@ -7,12 +7,11 @@ import (
 	"sync"
 	"time"
 
-	"github.com/Northern-Lights/os-rules-engine/rules"
-
-	protocol "github.com/Northern-Lights/os-rules-engine/ui"
 	"github.com/evilsocket/opensnitch/daemon/conman"
 	"github.com/evilsocket/opensnitch/daemon/log"
 	"github.com/evilsocket/opensnitch/daemon/statistics"
+	"github.com/evilsocket/opensnitch/rules"
+	protocol "github.com/evilsocket/opensnitch/ui"
 
 	// "github.com/evilsocket/opensnitch/daemon/ui/protocol"
 

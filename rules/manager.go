@@ -1,11 +1,10 @@
-package rule
+package rules
 
 import (
 	"fmt"
 	"sync"
 
-	"github.com/Northern-Lights/os-rules-engine/network"
-	"github.com/Northern-Lights/os-rules-engine/rules"
+	"github.com/evilsocket/opensnitch/network"
 )
 
 // Manager manages rules in memory and their storage
@@ -17,7 +16,7 @@ type Manager struct {
 	Loader
 	Saver
 
-	rules []*rules.Rule
+	rules []*Rule
 }
 
 func NewManager(f ExpressionDeserializer, opts ...ManagerOption) (*Manager, error) {
@@ -34,7 +33,7 @@ func NewManager(f ExpressionDeserializer, opts ...ManagerOption) (*Manager, erro
 }
 
 // Add adds the given rule and stores it, if a saver is set
-func (m *Manager) Add(r *rules.Rule) (err error) {
+func (m *Manager) Add(r *Rule) (err error) {
 	m.Lock()
 	defer m.Unlock()
 
@@ -44,7 +43,7 @@ func (m *Manager) Add(r *rules.Rule) (err error) {
 }
 
 // AddAndSave adds the given rule and stores it, if a saver is set
-func (m *Manager) AddAndSave(r *rules.Rule) (err error) {
+func (m *Manager) AddAndSave(r *Rule) (err error) {
 	m.Add(r)
 	if m.Saver != nil {
 		err = m.Saver.SaveRules(m.rules)
@@ -56,7 +55,7 @@ func (m *Manager) AddAndSave(r *rules.Rule) (err error) {
 // LoadRules uses the Loader to load and replace the in-memory rules. If an
 // error occurs, the in-memory rules are not replaced, and a nil ruleset is
 // returned with the error
-func (m *Manager) LoadRules() (ruleset []*rules.Rule, err error) {
+func (m *Manager) LoadRules() (ruleset []*Rule, err error) {
 	m.Lock()
 	defer m.Unlock()
 
@@ -84,7 +83,7 @@ func (m *Manager) Count() int {
 }
 
 // Match finds and returns the first matching rule or nil if no matches occured
-func (m *Manager) Match(conn *network.Connection) *rules.Rule {
+func (m *Manager) Match(conn *network.Connection) *Rule {
 	m.RLock()
 	defer m.RUnlock()
 

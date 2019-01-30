@@ -11,7 +11,6 @@ import (
 	"syscall"
 
 	engine "github.com/Northern-Lights/os-rules-engine"
-	"github.com/Northern-Lights/os-rules-engine/rules"
 	"github.com/evilsocket/opensnitch/daemon/conman"
 	"github.com/evilsocket/opensnitch/daemon/core"
 	"github.com/evilsocket/opensnitch/daemon/dns"
@@ -19,9 +18,9 @@ import (
 	"github.com/evilsocket/opensnitch/daemon/log"
 	"github.com/evilsocket/opensnitch/daemon/netfilter"
 	"github.com/evilsocket/opensnitch/daemon/procmon"
-	"github.com/evilsocket/opensnitch/daemon/rule"
 	"github.com/evilsocket/opensnitch/daemon/statistics"
 	"github.com/evilsocket/opensnitch/daemon/ui"
+	"github.com/evilsocket/opensnitch/rules"
 )
 
 var (
@@ -39,7 +38,7 @@ var (
 	memProfile = ""
 
 	err         = (error)(nil)
-	ruleManager *rule.Manager
+	ruleManager *rules.Manager
 	stats       = (*statistics.Statistics)(nil)
 	queue       = (*netfilter.Queue)(nil)
 	pktChan     = (<-chan netfilter.Packet)(nil)
@@ -78,12 +77,12 @@ func setupLogging() {
 
 func setupManager(rulesPath string) {
 	persistence := engine.NewJSONLoader(rulesPath)
-	mgrOpts := []rule.ManagerOption{
-		rule.WithLoader(persistence),
-		rule.WithSaver(persistence),
+	mgrOpts := []rules.ManagerOption{
+		rules.WithLoader(persistence),
+		rules.WithSaver(persistence),
 	}
 	var err error
-	ruleManager, err = rule.NewManager(engine.Deserialize, mgrOpts...)
+	ruleManager, err = rules.NewManager(engine.Deserialize, mgrOpts...)
 	if err != nil {
 		log.Fatal("Couldn't create rule manager: %s", err)
 	}

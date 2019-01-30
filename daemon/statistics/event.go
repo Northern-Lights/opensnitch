@@ -3,9 +3,9 @@ package statistics
 import (
 	"time"
 
-	"github.com/Northern-Lights/os-rules-engine/network"
-	"github.com/Northern-Lights/os-rules-engine/rules"
-	protocol "github.com/Northern-Lights/os-rules-engine/ui"
+	"github.com/evilsocket/opensnitch/network"
+	"github.com/evilsocket/opensnitch/rules"
+	protocol "github.com/evilsocket/opensnitch/ui"
 )
 
 const fmtTime = "2006-01-02 15:04:05"
