@@ -42,10 +42,10 @@ func main() {
 		syscall.SIGQUIT)
 
 	go func() {
+		defer lis.Close()
+		defer server.GracefulStop()
+		defer gui.Quit()
 		<-ch
-		gui.Quit()
-		server.GracefulStop()
-		lis.Close()
 	}()
 
 	err = server.Serve(lis)
