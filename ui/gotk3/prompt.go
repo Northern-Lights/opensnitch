@@ -198,8 +198,15 @@ func show(conn *network.Connection) {
 		rbPort.obj.SetLabel(fmt.Sprintf("Port %d", conn.DstPort))
 		rbDomainIP.obj.SetLabel(fmt.Sprintf("Domain/IP %s", conn.DstHost))
 
+		restoreButtonState()
+
 		dialog.ShowAll()
 	})
+}
+
+func restoreButtonState() {
+	rbQuit.obj.SetActive(true)
+	rbProcess.obj.SetActive(true)
 }
 
 func getAction(resp gtk.ResponseType) rules.Action {
