@@ -200,7 +200,8 @@ func onPacket(packet netfilter.Packet) {
 			}
 
 			// check if and how the rule needs to be saved
-			if r.Duration == rules.Duration_FIREWALL_SESSION {
+			// FIXME: "proc session" should be purged when the PID dies
+			if r.Duration == rules.Duration_FIREWALL_SESSION || r.Duration == rules.Duration_PROCESS_SESSION {
 				persistType = "Added"
 				// add to the rules but do not save to disk
 				if err := ruleManager.Add(r); err != nil {

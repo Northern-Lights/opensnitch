@@ -375,12 +375,13 @@
                     <property name="can_focus">False</property>
                     <property name="orientation">vertical</property>
                     <child>
-                      <object class="GtkRadioButton" id="radio_session">
-                        <property name="label" translatable="yes">FW Session</property>
+                      <object class="GtkRadioButton" id="radio_quit">
+                        <property name="label" translatable="yes">Until Quit</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="receives_default">False</property>
-                        <property name="tooltip_text" translatable="yes">Until the firewall is restarted</property>
+                        <property name="tooltip_text" translatable="yes">Until the process exits (uses PID)</property>
+                        <property name="active">True</property>
                         <property name="draw_indicator">True</property>
                       </object>
                       <packing>
@@ -390,14 +391,14 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkRadioButton" id="radio_forever">
-                        <property name="label" translatable="yes">Forever</property>
+                      <object class="GtkRadioButton" id="radio_session">
+                        <property name="label" translatable="yes">Until Restart</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="receives_default">False</property>
-                        <property name="active">True</property>
+                        <property name="tooltip_text" translatable="yes">Until the firewall is restarted (uses process path)</property>
                         <property name="draw_indicator">True</property>
-                        <property name="group">radio_session</property>
+                        <property name="group">radio_quit</property>
                       </object>
                       <packing>
                         <property name="expand">False</property>
@@ -406,18 +407,35 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkRadioButton" id="radio_once">
-                        <property name="label" translatable="yes">Once</property>
+                      <object class="GtkRadioButton" id="radio_forever">
+                        <property name="label" translatable="yes">Forever</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="receives_default">False</property>
+                        <property name="tooltip_text" translatable="yes">Save the rule (uses process path)</property>
                         <property name="draw_indicator">True</property>
-                        <property name="group">radio_session</property>
+                        <property name="group">radio_quit</property>
                       </object>
                       <packing>
                         <property name="expand">False</property>
                         <property name="fill">True</property>
                         <property name="position">2</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkRadioButton" id="radio_once">
+                        <property name="label" translatable="yes">Once</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="receives_default">False</property>
+                        <property name="tooltip_text" translatable="yes">One time, only (uses PID)</property>
+                        <property name="draw_indicator">True</property>
+                        <property name="group">radio_quit</property>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">3</property>
                       </packing>
                     </child>
                   </object>

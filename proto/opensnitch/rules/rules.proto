@@ -21,6 +21,7 @@ enum Action {
 enum Duration {
     DURATION_UNKNOWN = 0;
     ONCE = 1;
+    PROCESS_SESSION = 4;
     FIREWALL_SESSION = 2;
     ALWAYS = 3;
 }

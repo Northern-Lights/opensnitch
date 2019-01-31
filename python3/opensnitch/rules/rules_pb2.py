@@ -20,7 +20,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   package='opensnitch.rules',
   syntax='proto3',
   serialized_options=_b('Z&github.com/evilsocket/opensnitch/rules'),
-  serialized_pb=_b('\n\x1copensnitch/rules/rules.proto\x12\x10opensnitch.rules\"\x9d\x01\n\x04Rule\x12\x0c\n\x04name\x18\x04 \x01(\t\x12(\n\x06\x61\x63tion\x18\x01 \x01(\x0e\x32\x18.opensnitch.rules.Action\x12,\n\x08\x64uration\x18\x02 \x01(\x0e\x32\x1a.opensnitch.rules.Duration\x12/\n\tcondition\x18\x03 \x01(\x0b\x32\x1c.opensnitch.rules.Expression\"\xb7\x01\n\nExpression\x12.\n\toperation\x18\x01 \x01(\x0e\x32\x1b.opensnitch.rules.Operation\x12*\n\x04left\x18\x0e \x01(\x0b\x32\x1c.opensnitch.rules.Expression\x12+\n\x05right\x18\x0f \x01(\x0b\x32\x1c.opensnitch.rules.Expression\x12\x0f\n\x07strings\x18\x02 \x03(\t\x12\x0f\n\x07uint32s\x18\x03 \x03(\r*1\n\x06\x41\x63tion\x12\x12\n\x0e\x41\x43TION_UNKNOWN\x10\x00\x12\t\n\x05\x41LLOW\x10\x01\x12\x08\n\x04\x44\x45NY\x10\x02*L\n\x08\x44uration\x12\x14\n\x10\x44URATION_UNKNOWN\x10\x00\x12\x08\n\x04ONCE\x10\x01\x12\x14\n\x10\x46IREWALL_SESSION\x10\x02\x12\n\n\x06\x41LWAYS\x10\x03*\x91\x01\n\tOperation\x12\x15\n\x11OPERATION_UNKNOWN\x10\x00\x12\x08\n\x04TRUE\x10\t\x12\t\n\x05\x46\x41LSE\x10\n\x12\x07\n\x03\x41ND\x10\x01\x12\x06\n\x02OR\x10\x02\x12\x07\n\x03NOT\x10\x03\x12\n\n\x06\x44ST_IP\x10\x04\x12\x0c\n\x08\x44ST_HOST\x10\x05\x12\x0c\n\x08\x44ST_PORT\x10\x06\x12\r\n\tPROC_PATH\x10\x07\x12\x07\n\x03PID\x10\x08\x42(Z&github.com/evilsocket/opensnitch/rulesb\x06proto3')
+  serialized_pb=_b('\n\x1copensnitch/rules/rules.proto\x12\x10opensnitch.rules\"\x9d\x01\n\x04Rule\x12\x0c\n\x04name\x18\x04 \x01(\t\x12(\n\x06\x61\x63tion\x18\x01 \x01(\x0e\x32\x18.opensnitch.rules.Action\x12,\n\x08\x64uration\x18\x02 \x01(\x0e\x32\x1a.opensnitch.rules.Duration\x12/\n\tcondition\x18\x03 \x01(\x0b\x32\x1c.opensnitch.rules.Expression\"\xb7\x01\n\nExpression\x12.\n\toperation\x18\x01 \x01(\x0e\x32\x1b.opensnitch.rules.Operation\x12*\n\x04left\x18\x0e \x01(\x0b\x32\x1c.opensnitch.rules.Expression\x12+\n\x05right\x18\x0f \x01(\x0b\x32\x1c.opensnitch.rules.Expression\x12\x0f\n\x07strings\x18\x02 \x03(\t\x12\x0f\n\x07uint32s\x18\x03 \x03(\r*1\n\x06\x41\x63tion\x12\x12\n\x0e\x41\x43TION_UNKNOWN\x10\x00\x12\t\n\x05\x41LLOW\x10\x01\x12\x08\n\x04\x44\x45NY\x10\x02*a\n\x08\x44uration\x12\x14\n\x10\x44URATION_UNKNOWN\x10\x00\x12\x08\n\x04ONCE\x10\x01\x12\x13\n\x0fPROCESS_SESSION\x10\x04\x12\x14\n\x10\x46IREWALL_SESSION\x10\x02\x12\n\n\x06\x41LWAYS\x10\x03*\x91\x01\n\tOperation\x12\x15\n\x11OPERATION_UNKNOWN\x10\x00\x12\x08\n\x04TRUE\x10\t\x12\t\n\x05\x46\x41LSE\x10\n\x12\x07\n\x03\x41ND\x10\x01\x12\x06\n\x02OR\x10\x02\x12\x07\n\x03NOT\x10\x03\x12\n\n\x06\x44ST_IP\x10\x04\x12\x0c\n\x08\x44ST_HOST\x10\x05\x12\x0c\n\x08\x44ST_PORT\x10\x06\x12\r\n\tPROC_PATH\x10\x07\x12\x07\n\x03PID\x10\x08\x42(Z&github.com/evilsocket/opensnitch/rulesb\x06proto3')
 )
 
 _ACTION = _descriptor.EnumDescriptor(
@@ -65,18 +65,22 @@ _DURATION = _descriptor.EnumDescriptor(
       serialized_options=None,
       type=None),
     _descriptor.EnumValueDescriptor(
-      name='FIREWALL_SESSION', index=2, number=2,
+      name='PROCESS_SESSION', index=2, number=4,
       serialized_options=None,
       type=None),
     _descriptor.EnumValueDescriptor(
-      name='ALWAYS', index=3, number=3,
+      name='FIREWALL_SESSION', index=3, number=2,
+      serialized_options=None,
+      type=None),
+    _descriptor.EnumValueDescriptor(
+      name='ALWAYS', index=4, number=3,
       serialized_options=None,
       type=None),
   ],
   containing_type=None,
   serialized_options=None,
   serialized_start=447,
-  serialized_end=523,
+  serialized_end=544,
 )
 _sym_db.RegisterEnumDescriptor(_DURATION)
 
@@ -134,8 +138,8 @@ _OPERATION = _descriptor.EnumDescriptor(
   ],
   containing_type=None,
   serialized_options=None,
-  serialized_start=526,
-  serialized_end=671,
+  serialized_start=547,
+  serialized_end=692,
 )
 _sym_db.RegisterEnumDescriptor(_OPERATION)
 
@@ -145,6 +149,7 @@ ALLOW = 1
 DENY = 2
 DURATION_UNKNOWN = 0
 ONCE = 1
+PROCESS_SESSION = 4
 FIREWALL_SESSION = 2
 ALWAYS = 3
 OPERATION_UNKNOWN = 0

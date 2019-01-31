@@ -61,6 +61,7 @@ var (
 
 // radio buttons for duration selection
 var (
+	rbQuit    = promptRadioButton{id: "radio_quit"}
 	rbForever = promptRadioButton{id: "radio_forever"}
 	rbSession = promptRadioButton{id: "radio_session"}
 	rbOnce    = promptRadioButton{id: "radio_once"}
@@ -102,7 +103,7 @@ func initPrompt(uiFilePath string) error {
 
 	var radioButtons = []*promptRadioButton{
 		&rbProcess, &rbPort, &rbDomainIP,
-		&rbForever, &rbSession, &rbOnce,
+		&rbQuit, &rbForever, &rbSession, &rbOnce,
 	}
 	for _, btn := range radioButtons {
 		btn.obj = getRadioButton(promptBuilder, btn.id)
@@ -154,12 +155,11 @@ func dlgResponse(dlg *gtk.Dialog, resp gtk.ResponseType) {
 	// dlg is closed if we are here; we may unlock
 	lock <- struct{}{}
 
-	var (
-		a    = getAction(resp)
-		d    = getDuration()
-		cond = getCondition(d)
-		name = slug.Make(fmt.Sprintf("%s %s %v", a, d, cond)) // FIXME: need naming convention
-	)
+	a := getAction(resp)
+	d := getDuration()
+	procCondition := getProcessConditionPart(d)
+	cond := getCondition(procCondition)
+	name := slug.Make(fmt.Sprintf("%s %s %v", a, d, cond)) // FIXME: need naming convention
 
 	r := &rules.Rule{
 		Name:      name,
@@ -219,6 +219,8 @@ func getDuration() rules.Duration {
 		return rules.Duration_ONCE
 	case rbSession.obj.GetActive():
 		return rules.Duration_FIREWALL_SESSION
+	case rbQuit.obj.GetActive():
+		return rules.Duration_PROCESS_SESSION
 	case rbForever.obj.GetActive():
 		return rules.Duration_ALWAYS
 	}
@@ -226,13 +228,8 @@ func getDuration() rules.Duration {
 	panic(fmt.Errorf("No duration selected"))
 }
 
-func getCondition(duration rules.Duration) *rules.Expression {
-	var eval rules.EvaluatorSerializer
-	if duration == rules.Duration_ALWAYS {
-		eval = engine.ProcPath(req.conn.ProcessPath)
-	} else {
-		eval = engine.PID(req.conn.ProcessId)
-	}
+func getCondition(processCondition rules.EvaluatorSerializer) *rules.Expression {
+	eval := processCondition
 
 	switch {
 	case rbProcess.obj.GetActive():
@@ -251,4 +248,18 @@ func getCondition(duration rules.Duration) *rules.Expression {
 	}
 
 	return eval.Serialize()
+}
+
+// duration tells us whether to use process path or PID
+func getProcessConditionPart(d rules.Duration) (eval rules.EvaluatorSerializer) {
+	if usePathInsteadOfPID(d) {
+		eval = engine.ProcPath(req.conn.ProcessPath)
+	} else {
+		eval = engine.PID(req.conn.ProcessId)
+	}
+	return
+}
+
+func usePathInsteadOfPID(d rules.Duration) bool {
+	return d == rules.Duration_ALWAYS || d == rules.Duration_FIREWALL_SESSION
 }
