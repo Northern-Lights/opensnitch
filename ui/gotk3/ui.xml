@@ -303,12 +303,11 @@
                     <property name="can_focus">False</property>
                     <property name="orientation">vertical</property>
                     <child>
-                      <object class="GtkRadioButton" id="radio_process">
+                      <object class="GtkCheckButton" id="check_process">
                         <property name="label" translatable="yes">Process</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="receives_default">False</property>
-                        <property name="halign">start</property>
                         <property name="active">True</property>
                         <property name="draw_indicator">True</property>
                       </object>
@@ -319,14 +318,13 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkRadioButton" id="radio_port">
+                      <object class="GtkCheckButton" id="check_port">
                         <property name="label" translatable="yes">Port</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="receives_default">False</property>
-                        <property name="halign">start</property>
+                        <property name="active">True</property>
                         <property name="draw_indicator">True</property>
-                        <property name="group">radio_process</property>
                       </object>
                       <packing>
                         <property name="expand">False</property>
@@ -335,19 +333,46 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkRadioButton" id="radio_domain_ip">
-                        <property name="label" translatable="yes">Domain/IP</property>
+                      <object class="GtkCheckButton" id="check_ip">
+                        <property name="label" translatable="yes">IP</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="receives_default">False</property>
-                        <property name="halign">start</property>
+                        <property name="active">True</property>
                         <property name="draw_indicator">True</property>
-                        <property name="group">radio_process</property>
                       </object>
                       <packing>
                         <property name="expand">False</property>
                         <property name="fill">True</property>
                         <property name="position">2</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkCheckButton" id="check_host">
+                        <property name="label" translatable="yes">Host</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="receives_default">False</property>
+                        <property name="draw_indicator">True</property>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">3</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkCheckButton" id="check_domain">
+                        <property name="label" translatable="yes">Domain</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="receives_default">False</property>
+                        <property name="draw_indicator">True</property>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">4</property>
                       </packing>
                     </child>
                   </object>

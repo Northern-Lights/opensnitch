@@ -26,6 +26,11 @@ var req = struct {
 	rule chan *rules.Rule
 }{}
 
+type promptCheckButton struct {
+	id  string
+	obj *gtk.CheckButton
+}
+
 type promptLabel struct {
 	id  string
 	obj *gtk.Label
@@ -52,11 +57,13 @@ var (
 	labelPID   = promptLabel{id: "label_pid"}
 )
 
-// radio buttons for target selection
+// check buttons for target selection
 var (
-	rbProcess  = promptRadioButton{id: "radio_process"}
-	rbPort     = promptRadioButton{id: "radio_port"}
-	rbDomainIP = promptRadioButton{id: "radio_domain_ip"}
+	cbProcess = promptCheckButton{id: "check_process"}
+	cbPort    = promptCheckButton{id: "check_port"}
+	cbIP      = promptCheckButton{id: "check_ip"}
+	cbHost    = promptCheckButton{id: "check_host"}
+	cbDomain  = promptCheckButton{id: "check_domain"}
 )
 
 // radio buttons for duration selection
@@ -101,8 +108,17 @@ func initPrompt(uiFilePath string) error {
 		}
 	}
 
+	var checkButtons = []*promptCheckButton{
+		&cbProcess, &cbPort, &cbIP, &cbHost, &cbDomain,
+	}
+	for _, btn := range checkButtons {
+		btn.obj = getCheckButton(promptBuilder, btn.id)
+		if btn.obj == nil {
+			return fmt.Errorf(`gotk3: couldn't get check button "%s"`, btn.id)
+		}
+	}
+
 	var radioButtons = []*promptRadioButton{
-		&rbProcess, &rbPort, &rbDomainIP,
 		&rbQuit, &rbForever, &rbSession, &rbOnce,
 	}
 	for _, btn := range radioButtons {
@@ -195,8 +211,10 @@ func show(conn *network.Connection) {
 		labelPID.obj.SetText(
 			fmt.Sprintf("%d", conn.ProcessId))
 
-		rbPort.obj.SetLabel(fmt.Sprintf("Port %d", conn.DstPort))
-		rbDomainIP.obj.SetLabel(fmt.Sprintf("Domain/IP %s", conn.DstHost))
+		cbPort.obj.SetLabel(fmt.Sprintf("Port %d", conn.DstPort))
+		cbIP.obj.SetLabel(fmt.Sprintf("IP %s", conn.DstIp))
+		cbHost.obj.SetLabel(fmt.Sprintf("Host %s", conn.DstHost))
+		cbDomain.obj.SetLabel(fmt.Sprintf("Domain %s", conn.DstHost)) // TODO: *.x.com
 
 		restoreButtonState()
 
@@ -206,7 +224,11 @@ func show(conn *network.Connection) {
 
 func restoreButtonState() {
 	rbQuit.obj.SetActive(true)
-	rbProcess.obj.SetActive(true)
+	cbProcess.obj.SetActive(true)
+	cbPort.obj.SetActive(true)
+	cbIP.obj.SetActive(true)
+	cbHost.obj.SetActive(false)
+	cbDomain.obj.SetActive(false)
 }
 
 func getAction(resp gtk.ResponseType) rules.Action {
@@ -236,22 +258,48 @@ func getDuration() rules.Duration {
 }
 
 func getCondition(processCondition rules.EvaluatorSerializer) *rules.Expression {
-	eval := processCondition
+	var eval rules.EvaluatorSerializer
 
-	switch {
-	case rbProcess.obj.GetActive():
-		// add nothing further
+	if cbProcess.obj.GetActive() {
+		eval = processCondition
+	}
+	if cbPort.obj.GetActive() {
+		port := engine.Port(req.conn.DstPort)
+		if eval == nil {
+			eval = port
+		} else {
+			eval = engine.And(eval, port)
+		}
+	}
+	if cbIP.obj.GetActive() {
+		ip := engine.IPAddr(req.conn.DstIp)
+		if eval == nil {
+			eval = ip
+		} else {
+			eval = engine.And(eval, ip)
+		}
+	}
+	if cbHost.obj.GetActive() {
+		host := engine.Host(req.conn.DstHost)
+		if eval == nil {
+			eval = host
+		} else {
+			eval = engine.And(eval, host)
+		}
+	}
+	if cbDomain.obj.GetActive() {
+		// TODO: differentiate w/ host
+		domain := engine.Host(req.conn.DstHost)
+		if eval == nil {
+			eval = domain
+		} else {
+			eval = engine.And(eval, domain)
+		}
+	}
 
-	case rbPort.obj.GetActive():
-		eval = engine.And(engine.Port(req.conn.DstPort), eval)
-
-	case rbDomainIP.obj.GetActive():
-		eval = engine.And(engine.Host(req.conn.DstHost), eval)
-		// TODO: differentiate between IP and domain
-		// TODO: one for IP + port
-
-	default:
-		panic(fmt.Errorf("No operator selected"))
+	// if there is still nothing, it's a "true"
+	if eval == nil {
+		eval = engine.Bool(true)
 	}
 
 	return eval.Serialize()

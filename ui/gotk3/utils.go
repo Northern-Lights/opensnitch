@@ -18,6 +18,10 @@ func getButton(b *gtk.Builder, name string) *gtk.Button {
 	return getObject(b, name).(*gtk.Button)
 }
 
+func getCheckButton(b *gtk.Builder, name string) *gtk.CheckButton {
+	return getObject(b, name).(*gtk.CheckButton)
+}
+
 func getDialog(b *gtk.Builder, name string) *gtk.Dialog {
 	return getObject(b, name).(*gtk.Dialog)
 }
