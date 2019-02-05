@@ -11,6 +11,30 @@ import (
 	"google.golang.org/grpc"
 )
 
+func sigHandler() <-chan os.Signal {
+	ch := make(chan os.Signal, 1)
+	signal.Notify(ch,
+		syscall.SIGHUP,
+		syscall.SIGINT,
+		syscall.SIGTERM,
+		syscall.SIGQUIT)
+	return ch
+}
+
+func cleanupOnStop(sig <-chan os.Signal, l net.Listener, s *grpc.Server, quitGUI func() error) {
+	defer l.Close()
+	defer s.GracefulStop()
+	defer quitGUI()
+	<-sig
+}
+
+func createServer() *grpc.Server {
+	var service ui.Service
+	server := grpc.NewServer()
+	ui.RegisterUIServer(server, &service)
+	return server
+}
+
 func main() {
 	err := gui.Init(
 		"net.evilsocket.opensnitch",
@@ -25,28 +49,15 @@ func main() {
 		panic(err)
 	}
 
-	service := ui.Service{}.WithScheme("unix").WithPath("/tmp/osui.sock")
-	server := grpc.NewServer()
-	ui.RegisterUIServer(server, &service)
+	server := createServer()
 
 	lis, err := net.Listen("unix", "/tmp/osui.sock")
 	if err != nil {
 		panic(err)
 	}
 
-	ch := make(chan os.Signal, 1)
-	signal.Notify(ch,
-		syscall.SIGHUP,
-		syscall.SIGINT,
-		syscall.SIGTERM,
-		syscall.SIGQUIT)
-
-	go func() {
-		defer lis.Close()
-		defer server.GracefulStop()
-		defer gui.Quit()
-		<-ch
-	}()
+	sig := sigHandler()
+	go cleanupOnStop(sig, lis, server, gui.Quit)
 
 	err = server.Serve(lis)
 	if err != nil {

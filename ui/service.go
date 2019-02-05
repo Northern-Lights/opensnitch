@@ -3,7 +3,6 @@ package ui
 import (
 	"context"
 	"fmt"
-	"net/url"
 
 	engine "github.com/Northern-Lights/os-rules-engine"
 	"github.com/evilsocket/opensnitch/network"
@@ -16,30 +15,7 @@ import (
 )
 
 // Service is the implementation of the UI service defined in the gRPC proto
-type Service struct {
-	url url.URL
-}
-
-// WithScheme returns a Service with the new scheme
-// (e.g. http, https, unix, etc.)
-func (s Service) WithScheme(scheme string) Service {
-	s.url.Scheme = scheme
-	return s
-}
-
-// WithHost returns the Service with the new host. If you have a port to
-// specify, you can do that here
-func (s Service) WithHost(host string) Service {
-	s.url.Host = host
-	return s
-}
-
-// WithPath returns the Service with the new path. This is can be useful for
-// on-filesystem sockets using the unix scheme, for example
-func (s Service) WithPath(path string) Service {
-	s.url.Path = path
-	return s
-}
+type Service struct{}
 
 // AskRule implements the UI service's RPC, prompting the user for an action to
 // be taken on a connection
