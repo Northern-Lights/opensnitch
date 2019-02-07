@@ -36,10 +36,7 @@ func createServer() *grpc.Server {
 }
 
 func main() {
-	err := gui.Init(
-		"net.evilsocket.opensnitch",
-		os.ExpandEnv("${GOPATH}/src/github.com/evilsocket/opensnitch/ui/gotk3/ui.xml"),
-	)
+	err := gui.Init("net.evilsocket.opensnitch")
 	if err != nil {
 		panic(err)
 	}

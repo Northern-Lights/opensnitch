@@ -1,4 +1,4 @@
-all: proto-go proto-py3
+all: proto-go proto-py3 ui-lib opensnitchd opensnitch-ui
 
 proto-go:
 	protoc -I ./proto --go_out=plugins=grpc:. ./proto/opensnitch/network/*.proto
@@ -20,3 +20,12 @@ proto-py3:
 		--grpc_python_out=./python3/ \
 		./proto/opensnitch/ui/*.proto
 	find ./python3/opensnitch -type d -exec touch {}/__init__.py \;
+
+ui-lib:
+	cd ./ui && make
+
+opensnitchd:
+	go build ./cmd/opensnitchd
+
+opensnitch-ui:
+	go build ./cmd/opensnitch-ui

@@ -85,9 +85,9 @@ var signals = map[string]interface{}{
 var lock = make(chan struct{}, 1)
 
 // initPrompt initializes the prompt using the specified UI builder file
-func initPrompt(uiFilePath string) error {
+func initPrompt() error {
 	var err error
-	promptBuilder, err = gtk.BuilderNewFromFile(uiFilePath)
+	promptBuilder, err = gtk.BuilderNewFromFile(promptUIXMLBuilder)
 	if err != nil {
 		return err
 	}

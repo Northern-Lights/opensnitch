@@ -15,7 +15,7 @@ var (
 // prompt could have been an interface and returned upon init
 
 // Init initializes the application and its components
-func Init(appID, dlgUIFilePath string) error {
+func Init(appID string) error {
 	var err error
 	app, err = gtk.ApplicationNew(appID, glib.APPLICATION_FLAGS_NONE)
 	if err != nil {
@@ -25,7 +25,7 @@ func Init(appID, dlgUIFilePath string) error {
 	var activateErr error
 	activate := func() {
 		// FIXME: how do we catch this?
-		activateErr = initPrompt(dlgUIFilePath)
+		activateErr = initPrompt()
 
 		if activateErr != nil {
 			return
