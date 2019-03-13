@@ -32,6 +32,7 @@ var promptUIXMLBuilder = `
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
                 <signal name="clicked" handler="conn_deny" swapped="no"/>
+                <accelerator key="Return" signal="clicked" modifiers="GDK_MOD1_MASK"/>
               </object>
               <packing>
                 <property name="expand">True</property>
@@ -46,6 +47,7 @@ var promptUIXMLBuilder = `
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
                 <signal name="clicked" handler="conn_allow" swapped="no"/>
+                <accelerator key="Return" signal="clicked" modifiers="GDK_CONTROL_MASK"/>
               </object>
               <packing>
                 <property name="expand">True</property>
@@ -307,12 +309,14 @@ var promptUIXMLBuilder = `
                     <property name="orientation">vertical</property>
                     <child>
                       <object class="GtkCheckButton" id="check_process">
-                        <property name="label" translatable="yes">Process</property>
+                        <property name="label" translatable="yes">Pro_cess</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="receives_default">False</property>
+                        <property name="use_underline">True</property>
                         <property name="active">True</property>
                         <property name="draw_indicator">True</property>
+                        <accelerator key="c" signal="clicked"/>
                       </object>
                       <packing>
                         <property name="expand">False</property>
@@ -322,12 +326,14 @@ var promptUIXMLBuilder = `
                     </child>
                     <child>
                       <object class="GtkCheckButton" id="check_port">
-                        <property name="label" translatable="yes">Port</property>
+                        <property name="label" translatable="yes">_Port</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="receives_default">False</property>
+                        <property name="use_underline">True</property>
                         <property name="active">True</property>
                         <property name="draw_indicator">True</property>
+                        <accelerator key="p" signal="clicked"/>
                       </object>
                       <packing>
                         <property name="expand">False</property>
@@ -337,12 +343,14 @@ var promptUIXMLBuilder = `
                     </child>
                     <child>
                       <object class="GtkCheckButton" id="check_ip">
-                        <property name="label" translatable="yes">IP</property>
+                        <property name="label" translatable="yes">_IP</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="receives_default">False</property>
+                        <property name="use_underline">True</property>
                         <property name="active">True</property>
                         <property name="draw_indicator">True</property>
+                        <accelerator key="i" signal="clicked"/>
                       </object>
                       <packing>
                         <property name="expand">False</property>
@@ -352,11 +360,13 @@ var promptUIXMLBuilder = `
                     </child>
                     <child>
                       <object class="GtkCheckButton" id="check_host">
-                        <property name="label" translatable="yes">Host</property>
+                        <property name="label" translatable="yes">_Host</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="receives_default">False</property>
+                        <property name="use_underline">True</property>
                         <property name="draw_indicator">True</property>
+                        <accelerator key="h" signal="clicked"/>
                       </object>
                       <packing>
                         <property name="expand">False</property>
@@ -366,11 +376,13 @@ var promptUIXMLBuilder = `
                     </child>
                     <child>
                       <object class="GtkCheckButton" id="check_domain">
-                        <property name="label" translatable="yes">Domain</property>
+                        <property name="label" translatable="yes">_Domain</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="receives_default">False</property>
+                        <property name="use_underline">True</property>
                         <property name="draw_indicator">True</property>
+                        <accelerator key="d" signal="clicked"/>
                       </object>
                       <packing>
                         <property name="expand">False</property>
@@ -404,13 +416,15 @@ var promptUIXMLBuilder = `
                     <property name="orientation">vertical</property>
                     <child>
                       <object class="GtkRadioButton" id="radio_quit">
-                        <property name="label" translatable="yes">Until Quit</property>
+                        <property name="label" translatable="yes">Until _Quit</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="receives_default">False</property>
                         <property name="tooltip_text" translatable="yes">Until the process exits (uses PID)</property>
+                        <property name="use_underline">True</property>
                         <property name="active">True</property>
                         <property name="draw_indicator">True</property>
+                        <accelerator key="q" signal="clicked"/>
                       </object>
                       <packing>
                         <property name="expand">False</property>
@@ -420,13 +434,15 @@ var promptUIXMLBuilder = `
                     </child>
                     <child>
                       <object class="GtkRadioButton" id="radio_session">
-                        <property name="label" translatable="yes">Until Restart</property>
+                        <property name="label" translatable="yes">Until _Restart</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="receives_default">False</property>
                         <property name="tooltip_text" translatable="yes">Until the firewall is restarted (uses process path)</property>
+                        <property name="use_underline">True</property>
                         <property name="draw_indicator">True</property>
                         <property name="group">radio_quit</property>
+                        <accelerator key="r" signal="clicked"/>
                       </object>
                       <packing>
                         <property name="expand">False</property>
@@ -436,13 +452,15 @@ var promptUIXMLBuilder = `
                     </child>
                     <child>
                       <object class="GtkRadioButton" id="radio_forever">
-                        <property name="label" translatable="yes">Forever</property>
+                        <property name="label" translatable="yes">_Forever</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="receives_default">False</property>
                         <property name="tooltip_text" translatable="yes">Save the rule (uses process path)</property>
+                        <property name="use_underline">True</property>
                         <property name="draw_indicator">True</property>
                         <property name="group">radio_quit</property>
+                        <accelerator key="f" signal="clicked"/>
                       </object>
                       <packing>
                         <property name="expand">False</property>
@@ -452,13 +470,15 @@ var promptUIXMLBuilder = `
                     </child>
                     <child>
                       <object class="GtkRadioButton" id="radio_once">
-                        <property name="label" translatable="yes">Once</property>
+                        <property name="label" translatable="yes">_Once</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="receives_default">False</property>
                         <property name="tooltip_text" translatable="yes">One time, only (uses PID)</property>
+                        <property name="use_underline">True</property>
                         <property name="draw_indicator">True</property>
                         <property name="group">radio_quit</property>
+                        <accelerator key="o" signal="clicked"/>
                       </object>
                       <packing>
                         <property name="expand">False</property>

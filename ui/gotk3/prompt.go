@@ -87,7 +87,12 @@ var lock = make(chan struct{}, 1)
 // initPrompt initializes the prompt using the specified UI builder file
 func initPrompt() error {
 	var err error
-	promptBuilder, err = gtk.BuilderNewFromFile(promptUIXMLBuilder)
+	// promptBuilder, err = gtk.BuilderNewFromFile(promptUIXMLBuilder)
+	promptBuilder, err = gtk.BuilderNew()
+	if err != nil {
+		return err
+	}
+	err = promptBuilder.AddFromString(promptUIXMLBuilder)
 	if err != nil {
 		return err
 	}
